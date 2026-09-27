@@ -1,42 +1,38 @@
 // Vaulet — Prisma schema
-//
-// DEV DATABASE: SQLite (file-based, zero setup — see prisma/dev.db).
-// TO SWITCH TO POSTGRES LATER: change `provider = "sqlite"` to `provider = "postgresql"`
-// below and set DATABASE_URL in .env to a real Postgres connection string, then
-// run `npx prisma migrate dev`. No application code needs to change.
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
-  id            String          @id @default(cuid())
-  name          String
-  email         String          @unique
-  passwordHash  String
-  avatar        String?
-  createdAt     DateTime        @default(now())
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  avatar       String?
+  createdAt    DateTime @default(now())
 
-  vauletsOwned  Vaulet[]        @relation("VauletCreator")
-  memberships   VauletMember[]
-  transactions  Transaction[]
-  memories      Memory[]
+  vauletsOwned Vaulet[]       @relation("VauletCreator")
+  memberships  VauletMember[]
+  transactions Transaction[]
+  memories     Memory[]
 }
 
 model Vaulet {
-  id           String         @id @default(cuid())
-  name         String
-  description  String?
-  currency     String         @default("INR")
-  budget       Float?
-  createdById  String
-  createdBy    User           @relation("VauletCreator", fields: [createdById], references: [id])
-  createdAt    DateTime       @default(now())
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  currency    String   @default("INR")
+  budget      Float?
+  createdById String
+  createdBy   User     @relation("VauletCreator", fields: [createdById], references: [id])
+  createdAt   DateTime @default(now())
 
   members      VauletMember[]
   transactions Transaction[]
@@ -44,29 +40,27 @@ model Vaulet {
 }
 
 model VauletMember {
-  id        String   @id @default(cuid())
-  vauletId  String
-  vaulet    Vaulet   @relation(fields: [vauletId], references: [id], onDelete: Cascade)
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  role      String   @default("member") // "owner" | "member"
-  joinedAt  DateTime @default(now())
+  id       String   @id @default(cuid())
+  vauletId String
+  vaulet   Vaulet   @relation(fields: [vauletId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User     @relation(fields: [userId], references: [id])
+  role     String   @default("member")
+  joinedAt DateTime @default(now())
 
   @@unique([vauletId, userId])
 }
 
-// Balance is NEVER stored — it is always derived as:
-//   balance = sum(amount where type = contribution) - sum(amount where type = expense)
 model Transaction {
   id          String   @id @default(cuid())
   vauletId    String
   vaulet      Vaulet   @relation(fields: [vauletId], references: [id], onDelete: Cascade)
   userId      String
   user        User     @relation(fields: [userId], references: [id])
-  type        String   // "contribution" | "expense"
+  type        String
   amount      Float
   description String?
-  category    String?  // Food | Hotel | Transport | Activities | Shopping | Tickets | Other
+  category    String?
   merchant    String?
   location    String?
   receiptUrl  String?
@@ -74,14 +68,14 @@ model Transaction {
 }
 
 model Memory {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   vauletId  String
-  vaulet    Vaulet   @relation(fields: [vauletId], references: [id], onDelete: Cascade)
+  vaulet    Vaulet    @relation(fields: [vauletId], references: [id], onDelete: Cascade)
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
   imageUrl  String
   caption   String?
   location  String?
   takenAt   DateTime?
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 }
