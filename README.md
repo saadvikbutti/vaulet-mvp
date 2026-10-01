@@ -1,99 +1,50 @@
-# Vaulet — MVP
+# Vaulet
 
-A collaborative shared wallet for trips and experiences: create a Vaulet, invite people, everyone
-contributes, expenses are logged against the pool, the balance is always derived from the transaction
-log (never hand-edited), plus a lightweight photo Memory Vault and a budget-constrained AI trip planner.
+Vaulet is a shared wallet for trips and experiences. A group creates a Vaulet, adds existing members, records contributions and expenses, and keeps photos and a simple trip plan together. Wallet totals are calculated from the transaction history; they are never edited as a separate balance field.
 
-## Stack
+This rebuild keeps the original MVP's product flows while replacing its Next.js/TypeScript/Prisma implementation with a beginner-readable JavaScript stack:
 
-- **Next.js 14** (App Router) + **TypeScript**
-- **Tailwind CSS**
-- **Prisma** + **SQLite** for local dev (zero setup — one datasource line to swap to Postgres later)
-- **Custom auth**: bcrypt-hashed passwords + a signed JWT in an httpOnly cookie (no third-party auth
-  service required)
-- **AI Planner**: works out of the box with a deterministic, budget-safe mock. If you set
-  `ANTHROPIC_API_KEY`, it calls the real Claude API instead and falls back to the mock if that call
-  fails or somehow comes back over budget.
+- **Client:** HTML, CSS, JavaScript, React, Vite, React Router
+- **API:** Node.js, Express, REST, Mongoose
+- **Database:** MongoDB Atlas
+- **Authentication:** bcrypt password hashes, signed JWT in an HTTP-only cookie
+- **Media:** Cloudinary adapter (credentials required for actual uploads)
+- **Deployment target:** Vercel for the client; Render for the API; Atlas for MongoDB
 
-## Getting started
+Read [the architecture guide](docs/architecture.md) first, then [local setup and deployment](docs/deployment.md).
 
-```bash
-npm install
-npx prisma generate
-npx prisma db push      # creates prisma/dev.db with the schema
-npm run dev
-```
+## Run locally
 
-Open http://localhost:3000 — you'll be redirected to `/signup`. Create an account, then create your
-first Vaulet from the dashboard.
+Requirements: Node.js 20 or newer and npm.
 
-To add a second member to a Vaulet for testing, sign up a second account (in an incognito window) with
-a different email, then invite that email from the Vaulet's **Members** tab.
+1. Copy the server example and configure a reachable MongoDB database:
 
-### Moving to Postgres later
+   ```sh
+   cp server/.env.example server/.env
+   ```
 
-1. In `prisma/schema.prisma`, change `provider = "sqlite"` to `provider = "postgresql"`.
-2. Put a real Postgres connection string in `DATABASE_URL` (e.g. from Neon, Railway, or Supabase).
-3. Run `npx prisma migrate dev`.
+   Set `MONGODB_URI` to a reachable transaction-capable MongoDB Atlas deployment, and replace `JWT_SECRET` with a long random value. The API starts only when MongoDB is reachable.
 
-No application code changes — every query goes through `src/lib/prisma.ts`.
+2. Install dependencies and start both applications:
 
-### Enabling the real AI planner
+   ```sh
+   npm install
+   npm run dev
+   ```
 
-Set `ANTHROPIC_API_KEY` in `.env`. Nothing else changes; `src/lib/planner.ts` picks it up automatically
-and keeps the mock as a safety-net fallback.
+3. Open <http://localhost:5173>. The API listens at <http://localhost:5000>; health check: `/api/health`.
 
-## What's implemented (MVP scope)
+   The client defaults to `http://localhost:5000/api`. To override it, put `VITE_API_URL=http://localhost:5000/api` in `client/.env.local`.
 
-- Sign up / log in / log out / profile
-- Create a Vaulet (name, description, currency, optional target budget), invite members by email
-- Wallet: add a contribution, add an expense (with category, merchant, optional note) — **balance is
-  always `contributions − expenses`, computed at read time, never stored**
-- Full chronological transaction feed, grouped by day
-- Per-Vaulet dashboard: budget vs. spent vs. remaining, member count, spending by category, recent
-  activity — plus a cross-Vaulet dashboard at `/dashboard`
-- Memory Vault: upload a photo with caption/location, shown as a gallery
-- AI Planner: destination/people/days/budget/interests in → a day-by-day itinerary, hotel suggestions,
-  food suggestions, and a budget allocation breakdown out, with the budget enforced as a hard ceiling
-- Authorization: every Vaulet-scoped API route checks the session user is actually a member before
-  reading or writing anything (`src/lib/vaulet.ts`); the user id always comes from the session, never
-  from the request body
-- Validation: amounts must be positive, expenses can't push the balance negative, file uploads are
-  type/size-checked
+4. Sign up, create a Vaulet, and add another signed-up person's email from the Members tab.
 
-## Decisions made where the spec was ambiguous
+Cloudinary and AI credentials are optional for local development. Without an AI key, the planner returns a deterministic sample plan. Without Cloudinary credentials, image upload returns a configuration error rather than saving permanent files on an ephemeral server disk.
 
-- **Auth**: rolled a minimal JWT-cookie system instead of pulling in NextAuth, since the spec only
-  asked for "a simple authentication system appropriate for the chosen stack" and this keeps the
-  dependency footprint small.
-- **Storage**: receipts/memory photos are saved to `public/uploads` on the server's filesystem rather
-  than S3/Supabase Storage, since no cloud storage credentials were provided. `src/app/api/upload/route.ts`
-  is the one place to swap in a real object-storage call later.
-- **Invites**: "invite/add members" is implemented as add-by-email against an existing account (no
-  email-sending). Inviting someone without an account returns a clear error asking them to sign up
-  first, rather than building an email/invite-link flow, which felt like scope creep for an MVP.
-- **Expense guard-rail**: added a rule not explicitly in the spec — an expense is rejected if it would
-  push the Vaulet's balance below zero, since "prevent negative amounts" plus "balance = contributions
-  − expenses" implied the balance itself shouldn't go negative either. This is easy to remove in
-  `src/app/api/vaulets/[id]/transactions/route.ts` if you'd rather allow overdrawing.
-- **Category chart**: implemented as simple horizontal bars (no charting library) to keep the bundle
-  light, per "include a simple spending visualization if it can be implemented cleanly."
-- **Roles**: `owner`/`member` are stored per the data model, but for this MVP any member can add another
-  member (simplest invite flow). Owner-only actions can be layered in later using the existing
-  `ensureOwner()` helper in `src/lib/vaulet.ts`, which isn't called from anywhere yet.
+## Useful commands
 
-## A note on this environment
+- `npm run dev` — run Vite and Express together
+- `npm run build` — build the client
+- `npm run check` — syntax-check the API and build-check the Vite client
+- `npm start` — start the API server
 
-I wasn't able to run `npx prisma generate` in this sandbox (its engine binaries are fetched from a
-domain not reachable here), so I couldn't do a full `npm run build` end-to-end. I did run `tsc --noEmit`
-and confirmed the only errors are ones caused by the Prisma client not being generated yet (everything
-touching a Prisma query shows as untyped) — no other type errors surfaced. Run the "Getting started"
-steps above locally and it should build cleanly; if anything doesn't, it's most likely worth a second
-pass on my part rather than a fundamental design issue.
-
-## Extension points already in place for later phases
-
-- `src/lib/planner.ts` — swap the mock for a real travel API + AI provider
-- `src/app/api/upload/route.ts` — swap local disk writes for S3/Supabase Storage
-- `src/lib/vaulet.ts` — `ensureOwner()` is ready for owner-only actions (e.g. deleting a Vaulet)
-- Prisma `provider` — swap SQLite for Postgres with no code changes
+See `docs/` for the request flow, MongoDB model relationships, API contract, authentication, and Vercel/Render deployment setup.

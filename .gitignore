@@ -1,8 +1,8 @@
 node_modules/
-.next/
+client/dist/
+server/uploads/
 .env
-.env.local
-*.db
-*.db-journal
-*.sqlite
-*.sqlite3
+.env.*
+!.env.example
+.DS_Store
+npm-debug.log*
