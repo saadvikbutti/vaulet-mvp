@@ -1,6 +1,7 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 import { InlineMessage } from "../components/Feedback.jsx";
+import ThemeToggle from "../components/ThemeToggle.jsx";
 import { useState } from "react";
 
 const navigation = [
@@ -42,6 +43,7 @@ export default function AppLayout() {
             ))}
           </nav>
           <div className="account-menu">
+            <ThemeToggle />
             <NavLink to="/profile" className="user-chip" title="View your profile">
               <span className="avatar-small">{user?.name?.slice(0, 1)?.toUpperCase() || "V"}</span>
               <span className="user-chip-name">{user?.name || "Your profile"}</span>

@@ -1,4 +1,5 @@
 import { Link, Outlet } from "react-router-dom";
+import ThemeToggle from "../components/ThemeToggle.jsx";
 
 export default function AuthLayout() {
   return (
@@ -13,7 +14,7 @@ export default function AuthLayout() {
         <div className="auth-story-footer"><span>Shared wallets for going places</span><span>01 — 03</span></div>
         <div className="story-orbit orbit-one" /><div className="story-orbit orbit-two" /><div className="story-sun" />
       </aside>
-      <section className="auth-panel"><div className="auth-panel-inner"><Outlet /></div><p className="auth-footnote">A calmer way to spend together.</p></section>
+      <section className="auth-panel"><ThemeToggle className="auth-theme-toggle" /><div className="auth-panel-inner"><Outlet /></div><p className="auth-footnote">A calmer way to spend together.</p></section>
     </main>
   );
 }
