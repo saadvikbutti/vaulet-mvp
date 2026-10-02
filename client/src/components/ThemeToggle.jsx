@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 const KEY = "vaulet-theme";
-const COLORS = { light: "#f2f3ed", dark: "#0b1210" };
+const COLORS = { light: "#f7f2e9", dark: "#0d0c1f" };
 
 function applyTheme(theme) {
   document.documentElement.setAttribute("data-theme", theme);
