@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Your Vault!</title>
+</head>
+<body>
+    <header>
+        <h1>Vaulet</h1>
+        <h1>Create Your Vault!</h1>
+        <h2>Bring your people together and make your next plan happen.</h2>
+    </header>
+
+    <section class="vault-details">
+        <h1>Vault details</h1>
+        <div class="vault-form">
+            <FORM action="vault.html"> 
+                <div class="vault-name">
+                    <label for="name">Vault Name: </label>
+                    <input type="text" placeholder="eg. Goa Trip 2027">
+                </div>
+                
+                <div class="vault-description">
+                    <label for="name">Description: </label>
+                    <input type="text" placeholder="What are you saving for?">
+                </div>
+
+                <div class="goal-tyoe-btn">
+                    <button class="goal-type-travel">Travel</button>
+                    <button class="goal-type-concert">Concert</button>
+                    <button class="goal-type-gift">Gift</button>
+                    <button class="goal-type-other">Other</button>
+                </div>
+
+                <div class="vault-target-amt">
+                    <label for="name">Target Amount (₹): </label>
+                    <input type="text" placeholder="25,000">
+                </div>
+
+                <div class="vault-deadline">
+                    <label for="name">Description: </label>
+                    <input type="text" placeholder="Choose date">
+                </div>
+
+                <section class="disclaimer">
+                    <h3 class="disclaimer-head">How contributions work</h3>
+                    <p class="disclaimer-">Members pay separately and record their contributions in Vaulet. Vaulet does not hold or transfer money.</p>
+                </section>
+
+                <section class="create-vault-btn">
+                    <div>
+                        <button onclick="window.location.href='vault.html'">Create Vault</button>
+                    </div>
+                </section>
+
+                <section class="cancel-btn">
+                    <a href="index.html" class="cancel">Cancel</a>
+                    <a href="dashboard.html" class="dashboard">Move to Dashboard</a>
+                </section>
+            </FORM>
+        </div>
+    </section>
+</body>
+</html>

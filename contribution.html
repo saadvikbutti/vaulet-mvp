@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Record your contribution</title>
+</head>
+<body>
+    <header>
+        <h1>Vaulet</h1>
+        <h1>Your Vaults</h1>
+        <h2>BIG PLANS. BETTER TOGETHER.</h2>
+    </header>
+
+    <section class="go-back-btn">
+        <a href="vault.html">Go back to the Goa Trip</a>
+    </section>
+
+    <section class="contribute-details">
+        <h3>GOA TRIP · GROUP VAULT</h3>
+        <h1>Record a contribution</h1>
+        <p>Log your payment and keep everyone on the same page.</p>
+    </section>
+
+    <section class="contribution-to-section">
+        <h2>Goa Trip</h2>
+        <p>Target: ₹20,000</p>
+        <h3>Collected so far        ₹12,000</h3>
+        <h3>Your total contribution  ₹5,000</h3>
+    </section>
+
+    <section class="payment-details">
+        <form action="vault.html"></form>
+            
+            <div class="contribution-amt">
+                <label for="contribution-amt">Contribution amount (₹) *</label> <br>
+                <input type="text" placeholder="₹ 0.00">
+            </div>    
+
+            <div class="contribution-dop">
+                <label for="contribution-amt">Date of payment *</label> <br>
+                <input type="date" placeholder="DD / MM / YYYY">
+            </div>
+
+            <div class="payment-note">
+                <label for="payment-note">Payment note (optional)</label>
+                <input type="text" placeholder="e.g. Paid my share for hotel booking...">
+            </div>
+    </section>
+
+    <section class="payment-confirmation">
+        <div class="record-contribution-amt">
+            <button onclick="window.location.href='vault.html'">
+                Record Contribution Amount
+            </button>
+        </div>
+
+        <div class="payment-cancellation">
+            <button onclick="window.location.href='vault.html'">
+                Cancel
+            </button>
+        </div>
+
+        <div class="disclaimer">
+            <p>Vaulet records payments but never holds or transfers your money.</p>
+            <p>Your contribution will appear in the vault's contribution history.</p>
+        </div>
+    </section>
+
+</body>
+</html>
